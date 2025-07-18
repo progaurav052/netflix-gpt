@@ -1,6 +1,10 @@
 # netflix-gpt 
 -create React App
 -configured tailwind css 
+-Header
+-Routing of app
+-Login form
+-Signup form
 
 #Features
 - Browse (only comes after authentication)
@@ -10,6 +14,7 @@
        - title and Description
        - Movie suggetions and list1 
        - Movie suggestions and list 2
+       
        .....
        .....
 - login / sign up page 
