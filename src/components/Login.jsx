@@ -4,14 +4,18 @@ import checkValidData from "../utils/checkValidData";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true); // true for showing Sign-in and false for Showing sign-up form
   const [errorMessage, setErrorMessage] = useState(null);
+  const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null); // use this to refernce to the input box, used to refer tto value which is not used for rendering
+  const navigate = useNavigate();
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
   };
@@ -34,14 +38,21 @@ const Login = () => {
         .then((userCredential) => {
           // Signed up
           const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name.current.value,
+            photoURL:
+              "https://occ-0-2611-3663.1.nflxso.net/dnm/api/v6/vN7bi_My87NPKvsBoib006Llxzg/AAAABeuqjuQsRgqEDlibtJTI5BMf8IxhLlLOeIT6xI4TL57mqv7XHja43gx02S8pZVe8JNGRQXjnrUk1VcsTXqi83tFKPI6OR3k.png?r=bd7",
+          })
+            .then(() => {
+              navigate("/browse");
+            })
+            .catch((error) => {});
           console.log(user);
-          // ...
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
           setErrorMessage(errorCode + "-" + errorMessage);
-          // ..
         });
     } else {
       //sign-in logic
@@ -54,7 +65,7 @@ const Login = () => {
           // Signed in
           const user = userCredential.user;
           console.log(user);
-          // ...
+          navigate("/browse");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -81,6 +92,7 @@ const Login = () => {
         </h1>
         {!isSignInForm && (
           <input
+            ref={name}
             type="text"
             placeholder="Name"
             className="p-3 my-4 w-full bg-gray-700 rounded-lg"
