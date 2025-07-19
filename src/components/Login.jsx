@@ -1,6 +1,12 @@
 import React, { useState, useRef } from "react";
 import Header from "./Header";
 import checkValidData from "../utils/checkValidData";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true); // true for showing Sign-in and false for Showing sign-up form
   const [errorMessage, setErrorMessage] = useState(null);
@@ -8,6 +14,54 @@ const Login = () => {
   const password = useRef(null); // use this to refernce to the input box, used to refer tto value which is not used for rendering
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
+  };
+  const handleFormSubmit = () => {
+    const errorMessage = checkValidData(
+      email.current.value,
+      password.current.value
+    );
+    setErrorMessage(errorMessage);
+    if (errorMessage) return;
+
+    //go ahead for authentication
+    if (!isSignInForm) {
+      // sign-up logic
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+          // ..
+        });
+    } else {
+      //sign-in logic
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    }
   };
   return (
     <div>
@@ -46,13 +100,7 @@ const Login = () => {
         />
         <p className=" text-red-400">{errorMessage && errorMessage}</p>
         <button
-          onClick={() => {
-            const errorMessage = checkValidData(
-              email.current.value,
-              password.current.value
-            );
-            setErrorMessage(errorMessage);
-          }}
+          onClick={handleFormSubmit}
           className="p-3 my-4 bg-red-700 w-full rounded-lg"
         >
           {isSignInForm === true ? "Sign In" : "Sign Up"}
